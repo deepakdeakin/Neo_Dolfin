@@ -236,7 +236,6 @@ except Exception as e:
 
 # do, then print confirmation/error
 user_ops.init_dolfin_db()
-db_op.init_dolfin_db()
 # Debug and easy testing with API reference
 # print(API_CORE_ops.generate_auth_token())
 
@@ -344,14 +343,13 @@ def login():
             user_log.info("AUTH: User %s has been successfully authenticated. Session active."%(user.username)) # capture IP?
 
             ## This section should be done on authentication to avoid empty filling the dash
-            # user_ops.clear_transactions()  
-            db_op.clear_transactions()                            # Ensure no previous data remains from a previous user etc.
-            cache = db_op.request_transactions(user.username) 
-           # cache = user_ops.request_transactions_df(user.username)     # Get a dataframe of the last 500 transactions
-            #print(cache)           
-            db_op.cache_transactions(user.username, cache)
-           # db_op.cache_transactions(cache)                                     # used for testing and debugging
-           # user_ops.cache_transactions(cache)                          # Insert cahce in to database and confirm success
+            user_ops.clear_transactions()  # Ensure no previous data remains from a previous user etc.
+                                    
+
+            cache = user_ops.request_transactions_df(user.username)     # Get a dataframe of the last 500 transactions
+            #print(cache)                                               # used for testing and debugging
+                                               
+            user_ops.cache_transactions(cache)                          # Insert cahce in to database and confirm success
 
             # redirect to the dashboard.
             return redirect('/dash')
@@ -414,11 +412,9 @@ def register():
         db.session.commit()
 
 
-        #user_ops.register_basiq_id(new_user.id)      # Create a new entity on our API key, based on the data passed into the user registration form
-        db_op.register_basiq_id(new_user.id)
+        user_ops.register_basiq_id(new_user.id)      # Create a new entity on our API key, based on the data passed into the user registration form
         
-        #user_ops.link_bank_account(new_user.id)             # A user will need to link an account to their Basiq entity (that they won't see the entity)
-        db_op.link_bank_account(new_user.id)
+        user_ops.link_bank_account(new_user.id)             # A user will need to link an account to their Basiq entity (that they won't see the entity)
         # Log result
         user_log.info("REGISTER: New user %s, (%s %s) successfully registered and added to database."%(new_user.username,new_user.first_name, new_user.last_name))
 
